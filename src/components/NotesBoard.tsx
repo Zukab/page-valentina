@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { supabase, StickyNote as StickyNoteType } from '../lib/supabase';
 import StickyNote from './StickyNote';
 
@@ -8,6 +8,7 @@ const NOTE_COLORS = ['#fef3c7', '#fecaca', '#ddd6fe', '#bbf7d0', '#fde68a', '#fb
 export default function NotesBoard() {
   const [notes, setNotes] = useState<StickyNoteType[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [expandedNote, setExpandedNote] = useState<StickyNoteType | null>(null);
   const [newNote, setNewNote] = useState({ content: '', author_name: '' });
   const [selectedColor, setSelectedColor] = useState(NOTE_COLORS[0]);
 

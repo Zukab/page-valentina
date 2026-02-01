@@ -139,7 +139,13 @@ export default function StickyNote({ note, onDelete }: StickyNoteProps) {
         </div>
 
         {note.author_name && (
-          <div className="mt-auto pt-2 border-t border-gray-400/40 text-xs text-gray-600 italic font-poppins truncate">
+          <div 
+            onClick={(e) => {
+              e.stopPropagation();
+              onExpand();
+            }}
+            className="mt-auto pt-2 border-t border-gray-400/40 text-xs text-gray-600 italic font-poppins truncate cursor-pointer hover:text-gray-900 hover:underline"
+          >
             - {note.author_name}
           </div>
         )}
