@@ -27,6 +27,21 @@ export default function StickyNote({ note, onDelete }: StickyNoteProps) {
     };
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if ((e.target as HTMLElement).closest('button')) return;
+
+    setIsDragging(true);
+    const touch = e.touches[0];
+    dragRef.current = {
+      startX: touch.clientX,
+      startY: touch.clientY,
+      noteX: position.x,
+      noteY: position.y,
+      finalX: position.x,
+      finalY: position.y,
+    };
+  };
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging || !dragRef.current) return;
@@ -46,7 +61,27 @@ export default function StickyNote({ note, onDelete }: StickyNoteProps) {
       });
     };
 
-    const handleMouseUp = async () => {
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDragging || !dragRef.current) return;
+      e.preventDefault(); // Prevent scrolling while dragging
+
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - dragRef.current.startX;
+      const deltaY = touch.clientY - dragRef.current.startY;
+
+      const newX = dragRef.current.noteX + deltaX;
+      const newY = dragRef.current.noteY + deltaY;
+
+      dragRef.current.finalX = newX;
+      dragRef.current.finalY = newY;
+
+      setPosition({
+        x: newX,
+        y: newY,
+      });
+    };
+
+    const handleDragEnd = async () => {
       if (!isDragging || !dragRef.current) return;
 
       setIsDragging(false);
@@ -59,10 +94,14 @@ export default function StickyNote({ note, onDelete }: StickyNoteProps) {
 
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('mouseup', handleDragEnd);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleDragEnd);
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('mouseup', handleDragEnd);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleDragEnd);
       };
     }
   }, [isDragging]);
@@ -74,7 +113,7 @@ export default function StickyNote({ note, onDelete }: StickyNoteProps) {
 
   return (
     <div
-      className={`fixed w-36 h-36 p-3 shadow-xl rounded-lg cursor-move select-none transition-all origin-center ${
+      className={`fixed w-32 h-32 md:w-36 md:h-36 p-3 shadow-xl rounded-lg cursor-move select-none transition-all origin-center touch-none ${
         isDragging ? 'scale-110 shadow-2xl' : 'hover:scale-105 hover:shadow-2xl'
       }`}
       style={{
@@ -85,6 +124,7 @@ export default function StickyNote({ note, onDelete }: StickyNoteProps) {
         zIndex: isDragging ? 30 : 20,
       }}
       onMouseDown={handleMouseDown}
+      onTouchStart={handleTouchStart}
     >
       <div className="w-full h-full flex flex-col overflow-hidden">
         <button
