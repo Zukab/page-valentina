@@ -143,6 +143,34 @@ export default function NotesBoard() {
           </div>
         </div>
       )}
+
+      {expandedNote && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 pointer-events-auto"
+          onClick={() => setExpandedNote(null)}
+        >
+          <div 
+            className="rounded-2xl shadow-2xl p-8 w-full max-w-lg max-h-[90vh] overflow-y-auto transform transition-all scale-100 rotate-1 relative"
+            style={{ backgroundColor: expandedNote.color }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setExpandedNote(null)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-black/10 transition-colors"
+            >
+              <X size={24} className="text-gray-800" />
+            </button>
+            <p className="text-gray-800 whitespace-pre-wrap font-medium text-lg leading-relaxed">
+              {expandedNote.content}
+            </p>
+            {expandedNote.author_name && (
+              <p className="mt-6 text-right text-gray-600 italic">
+                - {expandedNote.author_name}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
